@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import 'isomorphic-fetch'; //We need this statement to use the Fetch API. You will also need to install isomorphic-fetch ('npm install --save isomorphic-fetch es6-promise') for
 //this code to work when you write your own code with the Fetch API. This was already done when you 'npm install'ed this project
 import './App.css';
-import {Card, FormControl, InputGroup, Button} from 'react-bootstrap';
+import {Card, FormControl, InputGroup} from 'react-bootstrap';
 
 console.log('process.env.REACT_APP_WEATHER_API_KEY', process.env.REACT_APP_WEATHER_API_KEY);
 
@@ -11,11 +11,11 @@ class App extends Component {
         super(props);
         this.state = {
             error: null,
-            isLoaded: false,
-            city: "", 
-            weather: []
+            isLoading: false,
+            data: {}
         };
 
+    this.handleKeyPress = this.handleKeyPress.bind(this);
     this.fetchCityWeather = this.fetchCityWeather.bind(this);
 
     this.city = React.createRef();
@@ -23,17 +23,24 @@ class App extends Component {
     componentDidMount() {
     }
 
+    handleKeyPress(target){
+        if(target.charCode==13){
+            return this.fetchCityWeather()  
+          } 
+    }
+
     fetchCityWeather(){
         const city = this.city.current.value;
         console.log("this.city.current.value", this.city.current.value);
+        this.setState({isLoading: true});
         fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city.split(" ").join("+")}&APPID=${process.env.REACT_APP_WEATHER_API_KEY}`)
         .then(res => res.json())
         .then(
-            (result) => {
-                console.log("result", result);
+            (data) => {
+                console.log("data", data);
                 this.setState({
-                    isLoaded: true,
-                    result
+                    isLoading: false,
+                    data
                 });
             },
             // Note: it's important to handle errors here  instead of a catch() block so that we don't swallow
@@ -41,35 +48,37 @@ class App extends Component {
             (error) => {
                 console.log("error", error);
                 this.setState({
-                    isLoaded: true,
+                    isLoading: false,
                     error
                 });
             })
     }
     
     _renderWeather(){
-        let { error, isLoaded, result } = this.state;
-        console.log(" error", error, "isLoaded", isLoaded, 'weather', weather);
-        const weather = (typeof result === "undefined")? [] : result.weather;
-        if(weather.length === 0){
-            return ""
-        } else if (error) {
+        let { error, isLoading, data } = this.state;
+        console.log(" error", error, "isLoaded", isLoading, 'dara', data);
+        
+        if (error) {
             return <div>Error: {error.message}</div>;
-        } else if (!isLoaded) {
+        }else if (data.hasOwnProperty('message')){
+            console.log("I'm here 2");
+            return <div style={{textTransform: "capitalize"}}>{data.message}</div>;
+        }else if (isLoading) {
             return <div>Loading...</div>;
-        } else if (weather.length > 0) {
+        }else if (data.hasOwnProperty('weather')) {
+            console.log("I'm here 3");
             return (
                 <Card style={{}}>
-                    <Card.Header style={{textTransform: "capitalize"}}>{result.name}</Card.Header>
-                    <Card.Img xs={4} variant="top" src={`https://openweathermap.org/img/wn/${weather[0].icon}@2x.png`} />
+                    <Card.Header style={{textTransform: "capitalize"}}>{data.name}</Card.Header>
+                    <Card.Img xs={4} variant="top" src={`https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`} />
                     <Card.Body>
-                        <Card.Title style={{textAlign: "center"}}>{weather[0].main}</Card.Title>
-                        <Card.Text style={{textAlign: "center"}}>{weather[0].description}</Card.Text>
+                        <Card.Title style={{textAlign: "center"}}>{data.weather[0].main}</Card.Title>
+                        <Card.Text style={{textAlign: "center"}}>{data.weather[0].description}</Card.Text>
                     </Card.Body>
                 </Card>
             );
-        } else {
-            return "";
+        }else{
+            return ""
         }
     }
 
@@ -86,9 +95,10 @@ class App extends Component {
                 aria-label="City"
                 aria-describedby="city-addon"
                 ref={this.city}
+                onKeyPress={this.handleKeyPress}
                 />
                 <InputGroup.Append>
-                <button variant="primary" type="button" onClick={this.fetchCityWeather}>Weather me!</button>
+                    <button class="primary" type="button" onClick={this.fetchCityWeather}>Weather me!</button>
                 </InputGroup.Append>
             </InputGroup>
             {this._renderWeather()}
