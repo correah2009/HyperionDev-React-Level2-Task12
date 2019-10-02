@@ -13,6 +13,5 @@ REACT_APP_W​EATHER_API_KEY={YOUR_API_KEY}
 ## Task User Stories
 
 Follow these steps:
-Follow these steps:
 ● Create a React app that will display the weather in a city of the user’s choice. The user should be able to enter or select the name of the city that they would like to see the weather for.
 ● Use the OpenWeatherMap API: ​https://openweathermap.org/current Consult the documentation of the API for instructions.
