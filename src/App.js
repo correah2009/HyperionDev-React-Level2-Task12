@@ -6,34 +6,53 @@ import {Card, FormControl, InputGroup} from 'react-bootstrap';
 
 console.log('process.env.REACT_APP_WEATHER_API_KEY', process.env.REACT_APP_WEATHER_API_KEY);
 
-class App extends Component {
+export const Weather = (props) => {
+    return (
+        <Card style={{}}>
+            <Card.Header style={{textTransform: "capitalize"}}>{props.data.name}</Card.Header>
+            <Card.Img xs={4} variant="top" src={`https://openweathermap.org/img/wn/${props.data.weather[0].icon}@2x.png`} />
+            <Card.ImgOverlay>
+                <Card.Title style={{fontSize: '50px', textAlign: 'center', marginTop: '360px'}}>{props.data.main.temp}&#176;F</Card.Title>
+            </Card.ImgOverlay>
+            <Card.Body>
+                <Card.Title style={{textAlign: "center"}}>{props.data.weather[0].main}</Card.Title>
+                <Card.Text style={{textAlign: "center"}}>{props.data.weather[0].description}</Card.Text>
+            </Card.Body>
+        </Card>
+    );
+} 
+
+export default class App extends Component {
     constructor(props) {
         super(props);
         this.state = {
             error: null,
             isLoading: false,
-            data: {}
+            data: {},
+            city: ''
         };
 
+    this.handleChange = this.handleChange.bind(this);
     this.handleKeyPress = this.handleKeyPress.bind(this);
     this.fetchCityWeather = this.fetchCityWeather.bind(this);
-
-    this.city = React.createRef();
     }
     componentDidMount() {
     }
 
+    handleChange (e){
+        this.setState({city: e.target.value});
+    }
     handleKeyPress(target){
-        if(target.charCode==13){
+        if(target.charCode===13){
             return this.fetchCityWeather()  
           } 
     }
 
     fetchCityWeather(){
-        const city = this.city.current.value;
-        console.log("this.city.current.value", this.city.current.value);
+        const city = this.state.city;
+        console.log("city", city);
         this.setState({isLoading: true});
-        fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city.split(" ").join("+")}&APPID=${process.env.REACT_APP_WEATHER_API_KEY}`)
+        fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city.split(" ").join("+")}&units=imperial&APPID=${process.env.REACT_APP_WEATHER_API_KEY}`)
         .then(res => res.json())
         .then(
             (data) => {
@@ -67,16 +86,7 @@ class App extends Component {
             return <div>Loading...</div>;
         }else if (data.hasOwnProperty('weather')) {
             console.log("I'm here 3");
-            return (
-                <Card style={{}}>
-                    <Card.Header style={{textTransform: "capitalize"}}>{data.name}</Card.Header>
-                    <Card.Img xs={4} variant="top" src={`https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`} />
-                    <Card.Body>
-                        <Card.Title style={{textAlign: "center"}}>{data.weather[0].main}</Card.Title>
-                        <Card.Text style={{textAlign: "center"}}>{data.weather[0].description}</Card.Text>
-                    </Card.Body>
-                </Card>
-            );
+            return <Weather data={data}/>
         }else{
             return ""
         }
@@ -94,11 +104,12 @@ class App extends Component {
                 placeholder="City"
                 aria-label="City"
                 aria-describedby="city-addon"
-                ref={this.city}
+                value={this.state.city}
+                onChange = {this.handleChange}
                 onKeyPress={this.handleKeyPress}
                 />
                 <InputGroup.Append>
-                    <button class="primary" type="button" onClick={this.fetchCityWeather}>Weather me!</button>
+                    <button className="primary" type="button" onClick={this.fetchCityWeather}>Weather me!</button>
                 </InputGroup.Append>
             </InputGroup>
             {this._renderWeather()}
@@ -106,7 +117,4 @@ class App extends Component {
 
      )
     }
- }
-
-
- export default App;
+}

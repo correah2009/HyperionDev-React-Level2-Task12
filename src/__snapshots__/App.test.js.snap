@@ -1,0 +1,65 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders correctly 1`] = `
+<div
+  className="card"
+  style={Object {}}
+>
+  <div
+    className="card-header"
+    style={
+      Object {
+        "textTransform": "capitalize",
+      }
+    }
+  >
+    Los Angeles
+  </div>
+  <img
+    className="card-img-top"
+    src="https://openweathermap.org/img/wn/01n@2x.png"
+    xs={4}
+  />
+  <div
+    className="card-img-overlay"
+  >
+    <div
+      className="card-title h5"
+      style={
+        Object {
+          "fontSize": "50px",
+          "marginTop": "360px",
+          "textAlign": "center",
+        }
+      }
+    >
+      78
+      °F
+    </div>
+  </div>
+  <div
+    className="card-body"
+  >
+    <div
+      className="card-title h5"
+      style={
+        Object {
+          "textAlign": "center",
+        }
+      }
+    >
+      Clear
+    </div>
+    <p
+      className="card-text"
+      style={
+        Object {
+          "textAlign": "center",
+        }
+      }
+    >
+      clear sky
+    </p>
+  </div>
+</div>
+`;
